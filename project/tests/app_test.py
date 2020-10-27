@@ -55,6 +55,11 @@ def test_delete_message(client):
     data = json.loads(rv.data)
     assert data["status"] == 1
 
+def test_search(client):
+    """Ensure the search functionality is working"""
+    rv = client.get('/search/')
+    assert rv.status_code == 200
+
 def test_login_logout(client):
     """Test login and logout using helper functions"""
     rv = login(client, app.config["USERNAME"], app.config["PASSWORD"])

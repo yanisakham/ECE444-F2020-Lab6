@@ -32,6 +32,16 @@ def logout(client):
     """Logout helper function"""
     return client.get("/logout", follow_redirects=True)
 
+def test_login_required(client):
+    """Ensure that you cannot delete without logging in"""
+    rv = client.get("/delete/1")
+    data = json.loads(rv.data)
+    assert(data["message"] == "Please log in.")
+    login(client, app.config["USERNAME"], app.config["PASSWORD"])
+    rv = client.get("/delete/1")
+    data = json.loads(rv.data)
+    assert(data["message"] == "Post Deleted")
+
 
 def test_index(client):
     response = client.get("/", content_type="html/text")
@@ -51,7 +61,11 @@ def test_empty_db(client):
 
 def test_delete_message(client):
     """Ensure the messages are being deleted"""
-    rv = client.get('/delete/1')
+    rv = client.get("/delete/1")
+    data = json.loads(rv.data)
+    assert data["status"] == 0
+    login(client, app.config["USERNAME"], app.config["PASSWORD"])
+    rv = client.get("/delete/1")
     data = json.loads(rv.data)
     assert data["status"] == 1
 
